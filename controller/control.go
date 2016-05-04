@@ -245,6 +245,13 @@ func (c *Controller) handleError(err error) error {
 			for address := range bErr.Errors {
 				c.setReplicaModeNoLock(address, types.ERR)
 			}
+			// if we still have a good replica, do not return error
+			for _, r := range replicas {
+				if r.mode == types.RW {
+					err = nil
+					break
+				}
+			}
 			c.Unlock()
 		}
 	}
